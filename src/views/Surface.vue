@@ -4,6 +4,10 @@
     <TextInput :propA="propBoth" />
     <div v-if="loading">Loading</div>
     <div v-if="this.fetched">{{ this.result }} m²</div>
+    <img
+      v-if="this.fetched"
+      :src="baseURL + '/static/' + coords + '_plotted' + '.png'"
+    />
   </div>
 </template>
 
@@ -11,10 +15,13 @@
 import { Component, Vue, Provide, Emit } from "vue-property-decorator";
 import TextInput from "../components/TextInput.vue";
 import { estimateSurface } from "../services/surface_service";
+import { baseURL } from "../utils";
 
 @Component({ components: { TextInput } })
 export default class Surface extends Vue {
+  @Provide() baseURL = baseURL;
   @Provide() result = 0;
+  @Provide() coords = "";
   @Provide() fetched = false;
   @Provide() loading = false;
   @Provide() propBoth = {
@@ -35,6 +42,7 @@ export default class Surface extends Vue {
     await estimateSurface({ info: info }).then(
       (res: number) => (this.result = Math.round(res))
     );
+    this.coords = input;
     this.fetched = true;
     this.loading = false;
   }
