@@ -1,5 +1,4 @@
 import axios from "axios";
-import FormData from "form-data";
 import { baseURL } from "../utils";
 
 interface SurfaceProps {
@@ -9,21 +8,17 @@ interface SurfaceProps {
 }
 
 export const estimateSurface = async (props: SurfaceProps): Promise<number> => {
-  const body = new FormData();
-  body.append("info", props.info);
-  body.append("closestFunction", props.closestFunction || "");
-  body.append("doThePlot", (props.doThePlot || false).toString());
-  const body2 = {
+  const body = {
     info: props.info,
     closestFunction: props.closestFunction || "",
-    doThePlot: (props.doThePlot || false).toString(),
+    doThePlot: props.doThePlot || false,
   };
-  console.log(body2);
+  console.log(body);
   const URL = baseURL + "/estimateSurface";
   const res = await axios({
     method: "POST",
     url: URL,
-    data: body2,
+    data: body,
     headers: {
       "Content-Type": "application/json",
     },
