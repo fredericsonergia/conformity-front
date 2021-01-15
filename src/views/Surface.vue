@@ -2,8 +2,9 @@
   <div class="surface">
     <h1>Calcul de la Surface</h1>
     <RadioButtons :radioProps="radioProps" />
-    <TextInput :props="propBoth" v-if="choice === 'coords'" />
+    <TextInput :props="propBoth" v-if="choice === 'coordinates'" />
     <TextInput :props="propsAdress" v-if="choice === 'address'" />
+    <div v-if="error != ''" class="error">{{ this.error }}</div>
     <div v-if="loading">Loading</div>
     <div v-if="this.fetched">{{ this.result }} m²</div>
     <img
@@ -28,6 +29,7 @@ export default class Surface extends Vue {
   @Provide() fetched = false;
   @Provide() loading = false;
   @Provide() choice = "";
+  @Provide() error = "";
   @Provide() propBoth = {
     placeholder: "Latitude, Longitude",
     onSubmit: (input: string) => {
@@ -51,7 +53,7 @@ export default class Surface extends Vue {
         label: "Adresse",
       },
       {
-        id: "coords",
+        id: "coordinates",
         label: "Coordonnées",
       },
     ],
@@ -64,21 +66,25 @@ export default class Surface extends Vue {
   }
   @Emit()
   async onSubmit(input: string) {
-    let info = "( , , )";
-    if (this.choice === "coords") {
-      const coordinates = "(" + input.trim() + ")";
-      info = "(address;1;" + coordinates + ")";
+    let info = "";
+    if (this.choice === "coordinates") {
+      info = input;
     } else if (this.choice === "address") {
       console.log(input);
-      info = "(" + input + ";1;(0,0))";
+      info = input;
     }
+    this.error = "";
     this.loading = true;
     this.fetched = false;
-    await estimateSurface({ info: info }).then((res: SurfaceOutput) => {
-      this.result = Math.round(res.surface);
-      this.coords = res.coordinates;
-      console.log(this.coords);
-    });
+    await estimateSurface({ type: this.choice, info: info })
+      .then((res: SurfaceOutput) => {
+        this.result = Math.round(res.surface);
+        this.coords = res.coordinates;
+      })
+      .catch((error) => {
+        this.loading = false;
+        this.error = error;
+      });
     this.fetched = true;
     this.loading = false;
   }
@@ -94,5 +100,8 @@ export default class Surface extends Vue {
 .inputsContainer {
   display: flex;
   justify-content: space-around;
+}
+.error {
+  color: red;
 }
 </style>
