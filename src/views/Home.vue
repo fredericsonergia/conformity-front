@@ -1,7 +1,12 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <div class="accueil">
+    <img
+      alt="logo sonergia"
+      src="../assets/cropped-LOGO_Sonergia-2020_inline.png"
+    />
+    <HelloWorld
+      msg="Bienvenue sur l'application de vérification de la conformité"
+    />
   </div>
 </template>
 
@@ -11,8 +16,14 @@ import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 
 @Component({
   components: {
-    HelloWorld
-  }
+    HelloWorld,
+  },
 })
 export default class Home extends Vue {}
 </script>
+
+<style scoped>
+.accueil > img {
+  max-width: 50% !important;
+}
+</style>

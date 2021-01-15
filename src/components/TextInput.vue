@@ -1,14 +1,14 @@
 <template>
   <div class="input">
-    {{ propA.before }}
-    <input type="text" v-model="input" :placeholder="propA.placeholder" />
-    {{ propA.unite }}
-    <button v-on:click="propA.onSubmit(input)">Envoyer</button>
+    {{ props.before }}
+    <input type="text" v-model="input" :placeholder="props.placeholder" />
+    {{ props.unite }}
+    <button v-on:click="props.onSubmit(input)">Envoyer</button>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Provide } from "vue-property-decorator";
+import { Component, Prop, Vue, Provide, Emit } from "vue-property-decorator";
 
 interface InputProps {
   placeholder: string;
@@ -19,9 +19,15 @@ interface InputProps {
 
 @Component
 export default class TextInput extends Vue {
-  @Prop() propA!: InputProps;
+  @Prop() props!: InputProps;
 
   @Provide() input = "";
+
+  @Emit()
+  onSubmit() {
+    this.props.onSubmit(this.input);
+    this.input = "";
+  }
 }
 </script>
 

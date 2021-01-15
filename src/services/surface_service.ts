@@ -7,7 +7,14 @@ interface SurfaceProps {
   doThePlot?: boolean;
 }
 
-export const estimateSurface = async (props: SurfaceProps): Promise<number> => {
+export interface SurfaceOutput {
+  surface: number;
+  coordinates: string;
+}
+
+export const estimateSurface = async (
+  props: SurfaceProps
+): Promise<SurfaceOutput> => {
   const body = {
     info: props.info,
     closestFunction: props.closestFunction || "",
@@ -23,5 +30,13 @@ export const estimateSurface = async (props: SurfaceProps): Promise<number> => {
       "Content-Type": "application/json",
     },
   });
-  return res.data;
+  const responseRaw = res.data;
+  console.log(responseRaw);
+  const response = responseRaw.split("[");
+  const surfaceOutput = {
+    surface: response[0],
+    coordinates: response[1].split("]")[0].replace(/\s+/g, ""),
+  };
+  console.log(surfaceOutput);
+  return surfaceOutput;
 };
