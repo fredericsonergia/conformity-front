@@ -16,7 +16,7 @@
 <script lang="ts">
 import { Component, Vue, Provide, Emit } from "vue-property-decorator";
 import TextInput from "../components/TextInput.vue";
-import RadioButtons from "../components/oui.vue";
+import RadioButtons from "../components/RadioButtons.vue";
 import { estimateSurface, SurfaceOutput } from "../services/surface_service";
 import { baseURL } from "../utils";
 
