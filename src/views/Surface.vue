@@ -1,11 +1,15 @@
 <template>
   <div class="surface">
     <h1>Calcul de la Surface</h1>
+    <button v-on:click="onclick">Utiliser la géolocalisation</button>
     <RadioButtons :radioProps="radioProps" />
     <TextInput :props="propBoth" v-if="choice === 'coordinates'" />
     <TextInput :props="propsAdress" v-if="choice === 'address'" />
     <div v-if="error != ''" class="error">{{ this.error }}</div>
-    <div v-if="loading">Loading</div>
+    <div v-if="gettingLocation">
+      Récupération des données de géolocalisation
+    </div>
+    <div v-if="loading">Calcul de la surface</div>
     <div v-if="this.fetched">{{ this.result }} m²</div>
     <img
       v-if="this.fetched"
@@ -30,6 +34,8 @@ export default class Surface extends Vue {
   @Provide() loading = false;
   @Provide() choice = "";
   @Provide() error = "";
+  @Provide() gettingLocation = false;
+  @Provide() location = { latitude: 0, longitude: 0 };
   @Provide() propBoth = {
     placeholder: "Latitude, Longitude",
     onSubmit: (input: string) => {
@@ -67,16 +73,22 @@ export default class Surface extends Vue {
   @Emit()
   async onSubmit(input: string) {
     let info = "";
+    let route = "";
     if (this.choice === "coordinates") {
       info = input;
+      route = this.choice;
     } else if (this.choice === "address") {
       console.log(input);
       info = input;
+      route = this.choice;
+    } else if (this.choice === "geolocation") {
+      info = input;
+      route = "coordinates";
     }
     this.error = "";
     this.loading = true;
     this.fetched = false;
-    await estimateSurface({ type: this.choice, info: info })
+    await estimateSurface({ type: route, info: info })
       .then((res: SurfaceOutput) => {
         this.result = Math.round(res.surface);
         this.coords = res.coordinates;
@@ -87,6 +99,25 @@ export default class Surface extends Vue {
       });
     this.fetched = true;
     this.loading = false;
+  }
+  @Emit()
+  onclick() {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.gettingLocation = false;
+        this.location = pos.coords;
+        this.choice = "geolocation";
+        this.onSubmit(
+          this.location.longitude.toString() +
+            "," +
+            this.location.latitude.toString()
+        );
+      },
+      (err) => {
+        this.gettingLocation = false;
+        this.error = err.message;
+      }
+    );
   }
 }
 </script>
