@@ -1,16 +1,19 @@
 <template>
   <div class="surface">
     <h1>Calcul de la Surface</h1>
-    <button v-on:click="onclick">Utiliser la géolocalisation</button>
+    <!-- <button v-on:click="onclick">Utiliser la géolocalisation</button> -->
     <RadioButtons :radioProps="radioProps" />
+    <button v-if="choice === 'geolocation'" v-on:click="onclick">
+      Utiliser la géolocalisation
+    </button>
     <TextInput :props="propBoth" v-if="choice === 'coordinates'" />
     <TextInput :props="propsAdress" v-if="choice === 'address'" />
     <div v-if="error != ''" class="error">{{ this.error }}</div>
     <div v-if="gettingLocation">
       Récupération des données de géolocalisation
     </div>
-    <div v-if="loading">Calcul de la surface</div>
-    <div v-if="this.fetched">{{ this.result }} m²</div>
+    <div v-if="loading">Calcul de la surface en cours ...</div>
+    <div v-if="this.fetched">Surface estimée : {{ this.result }} m²</div>
     <img
       v-if="this.fetched"
       :src="baseURL + '/static/' + coords.trim() + '_plotted' + '.png'"
@@ -37,12 +40,12 @@ export default class Surface extends Vue {
   @Provide() gettingLocation = false;
   @Provide() location = { latitude: 0, longitude: 0 };
   @Provide() propBoth = {
-    placeholder: "Latitude, Longitude",
+    placeholder: "Longitude, Latitude",
     onSubmit: (input: string) => {
       this.onSubmit(input);
     },
     unite: "°E, °N",
-    before: "Latitude, Longitude",
+    before: "Longitude, Latitude",
   };
   @Provide() propsAdress = {
     placeholder: "1 rue des Pissenlits, 75000 Paris",
@@ -59,9 +62,10 @@ export default class Surface extends Vue {
         label: "Adresse",
       },
       {
-        id: "coordinates",
-        label: "Coordonnées",
+        id: "geolocation",
+        label: "Géolocalisation",
       },
+      { id: "coordinates", label: "Coordonnées" },
     ],
     method: this.onRadioChange,
   };
@@ -102,6 +106,7 @@ export default class Surface extends Vue {
   }
   @Emit()
   onclick() {
+    this.gettingLocation = true;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         this.gettingLocation = false;
