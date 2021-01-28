@@ -9,6 +9,7 @@ interface SurfaceProps {
 export interface SurfaceOutput {
   surface: number;
   coordinates: string;
+  fileName: string;
 }
 
 export const estimateSurface = async (
@@ -32,11 +33,12 @@ export const estimateSurface = async (
       "Content-Type": "application/json",
     },
   });
+  console.log(res.data);
   const responseRaw = res.data;
-  console.log(responseRaw);
   const surfaceOutput = {
-    surface: responseRaw[0],
-    coordinates: responseRaw[1].toString(),
+    surface: responseRaw.surface,
+    coordinates: responseRaw.coords.toString(),
+    fileName: responseRaw.fileName
   };
   return surfaceOutput;
 };

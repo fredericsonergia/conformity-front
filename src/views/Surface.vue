@@ -14,10 +14,7 @@
     </div>
     <div v-if="loading">Calcul de la surface en cours ...</div>
     <div v-if="this.fetched">Surface estimée : {{ this.result }} m²</div>
-    <img
-      v-if="this.fetched"
-      :src="baseURL + '/static/' + coords.trim() + '_plotted' + '.png'"
-    />
+    <img v-if="this.fetched" :src="baseURL + this.fileName" />
   </div>
 </template>
 
@@ -33,6 +30,7 @@ export default class Surface extends Vue {
   @Provide() baseURL = baseURL;
   @Provide() result = 0;
   @Provide() coords = "";
+  @Provide() fileName = "";
   @Provide() fetched = false;
   @Provide() loading = false;
   @Provide() choice = "";
@@ -96,11 +94,13 @@ export default class Surface extends Vue {
       .then((res: SurfaceOutput) => {
         this.result = Math.round(res.surface);
         this.coords = res.coordinates;
+        this.fileName = res.fileName;
       })
       .catch((error) => {
         this.loading = false;
         this.error = error;
       });
+    console.log(this.fileName)
     this.fetched = true;
     this.loading = false;
   }
@@ -139,5 +139,8 @@ export default class Surface extends Vue {
 }
 .error {
   color: red;
+}
+img {
+  width: auto;
 }
 </style>
