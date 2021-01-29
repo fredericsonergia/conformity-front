@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
 import Surface from "../views/Surface.vue";
 import Presence from "../views/Presence.vue";
+import Conformite from "../views/Conformite.vue";
 
 Vue.use(VueRouter);
 
@@ -21,6 +22,11 @@ const routes: Array<RouteConfig> = [
     path: "/presence",
     name: "Presence",
     component: Presence,
+  },
+  {
+    path: "/conformite",
+    name: "Conformite",
+    component: Conformite,
   },
 ];
 
