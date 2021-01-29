@@ -1,15 +1,20 @@
 <template>
   <div class="surface">
     <h1>Calcul de la Surface</h1>
+    <!-- <button v-on:click="onclick">Utiliser la géolocalisation</button> -->
     <RadioButtons :radioProps="radioProps" />
-    <TextInput :props="propBoth" v-if="choice === 'coords'" />
+    <button v-if="choice === 'geolocation'" v-on:click="onclick">
+      Utiliser la géolocalisation
+    </button>
+    <TextInput :props="propBoth" v-if="choice === 'coordinates'" />
     <TextInput :props="propsAdress" v-if="choice === 'address'" />
-    <div v-if="loading">Loading</div>
-    <div v-if="this.fetched">{{ this.result }} m²</div>
-    <img
-      v-if="this.fetched"
-      :src="baseURL + '/static/' + coords.trim() + '_plotted' + '.png'"
-    />
+    <div v-if="error != ''" class="error">{{ this.error }}</div>
+    <div v-if="gettingLocation">
+      Récupération des données de géolocalisation
+    </div>
+    <div v-if="loading">Calcul de la surface en cours ...</div>
+    <div v-if="this.fetched">Surface estimée : {{ this.result }} m²</div>
+    <img v-if="this.fetched" :src="baseURL + this.fileName" />
   </div>
 </template>
 
@@ -25,16 +30,20 @@ export default class Surface extends Vue {
   @Provide() baseURL = baseURL;
   @Provide() result = 0;
   @Provide() coords = "";
+  @Provide() fileName = "";
   @Provide() fetched = false;
   @Provide() loading = false;
   @Provide() choice = "";
+  @Provide() error = "";
+  @Provide() gettingLocation = false;
+  @Provide() location = { latitude: 0, longitude: 0 };
   @Provide() propBoth = {
-    placeholder: "Latitude, Longitude",
+    placeholder: "Longitude, Latitude",
     onSubmit: (input: string) => {
       this.onSubmit(input);
     },
     unite: "°E, °N",
-    before: "Latitude, Longitude",
+    before: "Longitude, Latitude",
   };
   @Provide() propsAdress = {
     placeholder: "1 rue des Pissenlits, 75000 Paris",
@@ -51,9 +60,10 @@ export default class Surface extends Vue {
         label: "Adresse",
       },
       {
-        id: "coords",
-        label: "Coordonnées",
+        id: "geolocation",
+        label: "Géolocalisation",
       },
+      { id: "coordinates", label: "Coordonnées" },
     ],
     method: this.onRadioChange,
   };
@@ -64,23 +74,55 @@ export default class Surface extends Vue {
   }
   @Emit()
   async onSubmit(input: string) {
-    let info = "( , , )";
-    if (this.choice === "coords") {
-      const coordinates = "(" + input.trim() + ")";
-      info = "(address;1;" + coordinates + ")";
+    let info = "";
+    let route = "";
+    if (this.choice === "coordinates") {
+      info = input;
+      route = this.choice;
     } else if (this.choice === "address") {
       console.log(input);
-      info = "(" + input + ";1;(0,0))";
+      info = input;
+      route = this.choice;
+    } else if (this.choice === "geolocation") {
+      info = input;
+      route = "coordinates";
     }
+    this.error = "";
     this.loading = true;
     this.fetched = false;
-    await estimateSurface({ info: info }).then((res: SurfaceOutput) => {
-      this.result = Math.round(res.surface);
-      this.coords = res.coordinates;
-      console.log(this.coords);
-    });
+    await estimateSurface({ type: route, info: info })
+      .then((res: SurfaceOutput) => {
+        this.result = Math.round(res.surface);
+        this.coords = res.coordinates;
+        this.fileName = res.fileName;
+      })
+      .catch((error) => {
+        this.loading = false;
+        this.error = error;
+      });
+    console.log(this.fileName)
     this.fetched = true;
     this.loading = false;
+  }
+  @Emit()
+  onclick() {
+    this.gettingLocation = true;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.gettingLocation = false;
+        this.location = pos.coords;
+        this.choice = "geolocation";
+        this.onSubmit(
+          this.location.longitude.toString() +
+            "," +
+            this.location.latitude.toString()
+        );
+      },
+      (err) => {
+        this.gettingLocation = false;
+        this.error = err.message;
+      }
+    );
   }
 }
 </script>
@@ -94,5 +136,11 @@ export default class Surface extends Vue {
 .inputsContainer {
   display: flex;
   justify-content: space-around;
+}
+.error {
+  color: red;
+}
+img {
+  width: auto;
 }
 </style>

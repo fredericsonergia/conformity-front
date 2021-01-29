@@ -2,26 +2,29 @@ import axios from "axios";
 import { baseURL } from "../utils";
 
 interface SurfaceProps {
+  type: string;
   info: string;
-  closestFunction?: string;
-  doThePlot?: boolean;
 }
 
 export interface SurfaceOutput {
   surface: number;
   coordinates: string;
+  fileName: string;
 }
 
 export const estimateSurface = async (
   props: SurfaceProps
 ): Promise<SurfaceOutput> => {
-  const body = {
-    info: props.info,
-    closestFunction: props.closestFunction || "",
-    doThePlot: props.doThePlot || false,
-  };
+  const body =
+    props.type == "address"
+      ? {
+          address: props.info,
+        }
+      : {
+          coordinates: props.info,
+        };
   console.log(body);
-  const URL = baseURL + "/estimateSurface";
+  const URL = baseURL + `/estimateSurface/${props.type}`;
   const res = await axios({
     method: "POST",
     url: URL,
@@ -30,13 +33,12 @@ export const estimateSurface = async (
       "Content-Type": "application/json",
     },
   });
+  console.log(res.data);
   const responseRaw = res.data;
-  console.log(responseRaw);
-  const response = responseRaw.split("[");
   const surfaceOutput = {
-    surface: response[0],
-    coordinates: response[1].split("]")[0].replace(/\s+/g, ""),
+    surface: responseRaw.surface,
+    coordinates: responseRaw.coords.toString(),
+    fileName: responseRaw.fileName
   };
-  console.log(surfaceOutput);
   return surfaceOutput;
 };
