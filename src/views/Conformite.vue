@@ -13,20 +13,17 @@
       Lancer
     </button>
     <img v-if="this.fetched" :src="dataUrl" />
-    <div v-if="this.fetched && this.responsePredict">
-      La protection est conforme
+    <div v-if="this.fetched">
+      Distance : {{ Math.round(this.responsePredict * 100) / 100 }} cm
     </div>
-    <div v-if="this.fetched && !this.responsePredict">
-      La protection n'est pas conforme
-    </div>
-    <div v-if="this.fetched">score de confiance : {{ this.responseScore }}</div>
+
     <div v-if="this.loading">Calcul en cours</div>
   </div>
 </template>
 
 <script>
 import FileUploader from "../components/FileUploader.vue";
-import { predictProtection } from "../services/presence_service";
+import { predictConformity } from "../services/conformity_service.ts";
 
 export default {
   components: { FileUploader },
@@ -35,8 +32,7 @@ export default {
       fetched: false,
       loading: false,
       responseImage: "",
-      responseScore: 0,
-      responsePredict: false,
+      responsePredict: 0,
       inputFile: undefined,
     };
   },
@@ -54,11 +50,9 @@ export default {
     async handleSubmit() {
       this.loading = true;
       this.fetched = false;
-      console.log(this.inputFile);
-      const response = await predictProtection(this.inputFile);
+      const response = await predictConformity(this.inputFile);
       this.responseImage = response.image;
-      this.responseScore = response.score;
-      this.responsePredict = response.prediction === "True";
+      this.responsePredict = response.prediction;
       this.fetched = true;
       this.loading = false;
     },

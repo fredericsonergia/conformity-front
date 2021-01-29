@@ -24,7 +24,7 @@
 
 <script>
 import FileUploader from "../components/FileUploader.vue";
-import { predictProtection } from "../services/presence_service";
+import { predictPresence } from "../services/presence_service";
 
 export default {
   components: { FileUploader },
@@ -52,8 +52,7 @@ export default {
     async handleSubmit() {
       this.loading = true;
       this.fetched = false;
-      console.log(this.inputFile);
-      const response = await predictProtection(this.inputFile);
+      const response = await predictPresence(this.inputFile);
       this.responseImage = response.image;
       this.responseScore = response.score;
       this.responsePredict = response.prediction === "True";
