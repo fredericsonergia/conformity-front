@@ -1,6 +1,8 @@
 <template>
   <div>
     <h1>Conformité de la Détection</h1>
+    <div v-if="this.failed">Echec du calcul, veuillez recommencer</div>
+    <br />
     <FileUploader
       v-if="!this.fetched && !this.loading"
       v-on:fileChange="this.handleFileChange"
@@ -16,7 +18,6 @@
     <div v-if="this.fetched">
       Distance : {{ Math.round(this.responsePredict * 100) / 100 }} cm
     </div>
-
     <div v-if="this.loading">Calcul en cours</div>
   </div>
 </template>
@@ -30,6 +31,7 @@ export default {
   data() {
     return {
       fetched: false,
+      failed: false,
       loading: false,
       responseImage: "",
       responsePredict: 0,
@@ -51,9 +53,13 @@ export default {
       this.loading = true;
       this.fetched = false;
       const response = await predictConformity(this.inputFile);
-      this.responseImage = response.image;
-      this.responsePredict = response.prediction;
-      this.fetched = true;
+      if (response) {
+        this.responseImage = response.image;
+        this.responsePredict = response.prediction;
+        this.fetched = true;
+      } else {
+        this.failed = true;
+      }
       this.loading = false;
     },
   },

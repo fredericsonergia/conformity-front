@@ -1,6 +1,8 @@
 <template>
   <div>
     <h1>Présence de la Détection</h1>
+    <div v-if="this.failed">Echec du calcul, veuillez recommencer</div>
+    <br />
     <FileUploader
       v-if="!this.fetched && !this.loading"
       v-on:fileChange="this.handleFileChange"
@@ -32,6 +34,7 @@ export default {
     return {
       fetched: false,
       loading: false,
+      failed: false,
       responseImage: "",
       responseScore: 0,
       responsePredict: false,
@@ -53,10 +56,15 @@ export default {
       this.loading = true;
       this.fetched = false;
       const response = await predictPresence(this.inputFile);
-      this.responseImage = response.image;
-      this.responseScore = response.score;
-      this.responsePredict = response.prediction === "True";
-      this.fetched = true;
+      if (response) {
+        this.responseImage = response.image;
+        this.responseScore = response.score;
+        this.responsePredict = response.prediction === "True";
+        this.fetched = true;
+      } else {
+        this.failed = true;
+      }
+
       this.loading = false;
     },
   },
