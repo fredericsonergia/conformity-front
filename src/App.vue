@@ -3,7 +3,8 @@
     <div id="nav">
       <router-link to="/">Accueil</router-link> |
       <router-link to="/surface">Surface</router-link> |
-      <router-link to="/presence">Presence</router-link>
+      <router-link to="/presence">Presence</router-link> |
+      <router-link to="/conformite">Conformité</router-link>
     </div>
     <router-view />
   </div>
