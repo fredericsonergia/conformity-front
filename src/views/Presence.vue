@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Présence de la Détection</h1>
+    <h1>Présence de la Protection</h1>
     <FileUploader
       v-if="!this.fetched && !this.loading"
       v-on:fileChange="this.handleFileChange"
