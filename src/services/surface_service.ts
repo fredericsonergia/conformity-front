@@ -16,7 +16,7 @@ export interface SurfaceOutputFromCV {
   coordinates: string;
   fileName: string;
   buildings: number[][][][];
-  surfaces: Array<number>;
+  surfaces: number[];
   metrics: { label: string; value: number }[];
 }
 

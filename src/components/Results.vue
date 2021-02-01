@@ -1,5 +1,5 @@
 <template>
-  <div class="radio">
+  <div>
     <div>Surface estimée : {{ this.result.result }} m²</div>
     <div>
       <map name="buildings">
