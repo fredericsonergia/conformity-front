@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Conformité de la Détection</h1>
+    <h1>Conformité de la Protection</h1>
     <div v-if="this.failed">Echec du calcul, veuillez recommencer</div>
     <br />
     <FileUploader
