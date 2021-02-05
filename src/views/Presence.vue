@@ -55,7 +55,7 @@ export default {
       const response = await predictPresence(this.inputFile);
       this.responseImage = response.image;
       this.responseScore = response.score;
-      this.responsePredict = response.prediction === "True";
+      this.responsePredict = response.prediction;
       this.fetched = true;
       this.loading = false;
     },
