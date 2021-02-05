@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const URL = "http://localhost:8888/predict_conformity";
+const URL = "http://localhost:8000/predict_conformity";
 
 export const predictConformity = async (inputFile: File) => {
   const formData = new FormData();
@@ -11,10 +11,7 @@ export const predictConformity = async (inputFile: File) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    let response = res.data;
-    response = response.replaceAll("'", '"');
-    response = JSON.parse(response);
-    return response;
+    return res.data;
   } catch (e) {
     console.log(e);
   }

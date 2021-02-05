@@ -19,7 +19,9 @@
     <div v-if="this.fetched && !this.responsePredict">
       Il n'y a pas de protection
     </div>
-    <div v-if="this.fetched">score de confiance : {{ this.responseScore }}</div>
+    <div v-if="this.fetched">
+      score de confiance : {{ Math.round(this.responseScore * 100) / 100 }}
+    </div>
     <div v-if="this.loading">Calcul en cours</div>
   </div>
 </template>
@@ -59,7 +61,7 @@ export default {
       if (response) {
         this.responseImage = response.image;
         this.responseScore = response.score;
-        this.responsePredict = response.prediction === "True";
+        this.responsePredict = response.prediction;
         this.fetched = true;
       } else {
         this.failed = true;
