@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Conformité de la Protection</h1>
-    <div v-if="this.failed">Echec du calcul, veuillez recommencer</div>
+    <div v-if="this.failed">{{ responseMessage }}</div>
     <br />
     <FileUploader
       v-if="!this.fetched && !this.loading"
@@ -35,6 +35,7 @@ export default {
       loading: false,
       responseImage: "",
       responsePredict: 0,
+      responseMessage: "",
       inputFile: undefined,
     };
   },
@@ -53,11 +54,12 @@ export default {
       this.loading = true;
       this.fetched = false;
       const response = await predictConformity(this.inputFile);
-      if (response) {
+      if (response["type"] == "valid") {
         this.responseImage = response.image;
         this.responsePredict = response.distance;
         this.fetched = true;
       } else {
+        this.responseMessage = response.message;
         this.failed = true;
       }
       this.loading = false;
