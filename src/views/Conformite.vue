@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Conformité de la Protection</h1>
-    <div v-if="this.failed">{{ responseMessage }}</div>
+    <div v-if="this.failed">{{ this.responseMessage }}</div>
     <br />
     <FileUploader
       v-if="!this.fetched && !this.loading"
