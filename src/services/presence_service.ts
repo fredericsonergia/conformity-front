@@ -11,7 +11,6 @@ export const predictPresence = async (inputFile: File) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log(JSON.stringify(res.data));
     return res.data;
   } catch (e) {
     console.log(e);

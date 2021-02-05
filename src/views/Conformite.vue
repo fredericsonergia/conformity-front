@@ -52,7 +52,7 @@ export default {
       this.fetched = false;
       const response = await predictConformity(this.inputFile);
       this.responseImage = response.image;
-      this.responsePredict = response.prediction;
+      this.responsePredict = response.distance;
       this.fetched = true;
       this.loading = false;
     },
