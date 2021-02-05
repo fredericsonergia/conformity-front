@@ -4,7 +4,7 @@
       <input type="file" @change="onFileChange" />
     </div>
     <div v-else>
-      <img :src="image" />
+      <img :src="image" class="uploader" />
       <button @click="removeImage">Enlever l'image</button>
     </div>
   </div>
@@ -43,7 +43,7 @@ export default {
   text-align: center;
 }
 
-img {
+img.uploader {
   width: 30%;
   margin: auto;
   display: block;

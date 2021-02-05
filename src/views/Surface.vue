@@ -1,8 +1,24 @@
 <template>
   <div class="surface">
     <h1>Calcul de la Surface</h1>
-    <!-- <button v-on:click="onclick">Utiliser la géolocalisation</button> -->
-    <RadioButtons :radioProps="radioProps" />
+    <select v-model="selected">
+      <option disabled value="">Choisissez la méthode de calcul</option>
+      <option>Géographique</option>
+      <option>Reconnaissance d'image</option>
+    </select>
+    <RadioButtons
+      :radioProps="{
+        choices: radioProps.choices.filter((choice) => {
+          return (
+            (selected === 'Reconnaissance d\'image' &&
+              choice.id != 'address') ||
+            selected === 'Géographique'
+          );
+        }),
+        method: radioProps.method,
+      }"
+      v-if="selected"
+    />
     <button v-if="choice === 'geolocation'" v-on:click="onclick">
       Utiliser la géolocalisation
     </button>
@@ -13,8 +29,7 @@
       Récupération des données de géolocalisation
     </div>
     <div v-if="loading">Calcul de la surface en cours ...</div>
-    <div v-if="this.fetched">Surface estimée : {{ this.result }} m²</div>
-    <img v-if="this.fetched" :src="baseURL + this.fileName" />
+    <Results v-if="this.fetched" :result="this.result" />
   </div>
 </template>
 
@@ -22,15 +37,18 @@
 import { Component, Vue, Provide, Emit } from "vue-property-decorator";
 import TextInput from "../components/TextInput.vue";
 import RadioButtons from "../components/RadioButtons.vue";
-import { estimateSurface, SurfaceOutput } from "../services/surface_service";
-import { baseURL } from "../utils";
+import Results, { ResultPropsInit } from "../components/Results.vue";
+import {
+  estimateSurface,
+  SurfaceOutput,
+  estimateSurfaceFromCV,
+  SurfaceOutputFromCV,
+} from "../services/surface_service";
 
-@Component({ components: { TextInput, RadioButtons } })
+@Component({ components: { TextInput, RadioButtons, Results } })
 export default class Surface extends Vue {
-  @Provide() baseURL = baseURL;
-  @Provide() result = 0;
-  @Provide() coords = "";
-  @Provide() fileName = "";
+  @Provide() selected = "";
+  @Provide() result = ResultPropsInit;
   @Provide() fetched = false;
   @Provide() loading = false;
   @Provide() choice = "";
@@ -90,17 +108,35 @@ export default class Surface extends Vue {
     this.error = "";
     this.loading = true;
     this.fetched = false;
-    await estimateSurface({ type: route, info: info })
-      .then((res: SurfaceOutput) => {
-        this.result = Math.round(res.surface);
-        this.coords = res.coordinates;
-        this.fileName = res.fileName;
-      })
-      .catch((error) => {
-        this.loading = false;
-        this.error = error;
-      });
-    console.log(this.fileName)
+    if (this.selected === "Géographique") {
+      await estimateSurface({ type: route, info: info })
+        .then((res: SurfaceOutput) => {
+          this.result.result = Math.round(res.surface);
+          this.result.coords = res.coordinates;
+          this.result.fileName = res.fileName;
+          this.result.metrics = [];
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.error = error;
+        });
+    } else {
+      await estimateSurfaceFromCV({ type: route, info: info })
+        .then((res: SurfaceOutputFromCV) => {
+          this.result.result = Math.round(res.surface);
+          this.result.coords = res.coordinates;
+          this.result.fileName = res.fileName;
+          this.result.metrics = res.metrics;
+          this.result.contours = res.buildings;
+          this.result.surfaces = res.surfaces;
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.error = error;
+        });
+    }
+
+    console.log(this.result.fileName);
     this.fetched = true;
     this.loading = false;
   }
@@ -139,8 +175,5 @@ export default class Surface extends Vue {
 }
 .error {
   color: red;
-}
-img {
-  width: auto;
 }
 </style>
