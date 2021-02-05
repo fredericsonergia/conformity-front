@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const URL = "http://localhost:8888/predict_presence";
+const URL = "http://localhost:8000/predict_presence";
 
 export const predictPresence = async (inputFile: File) => {
   const formData = new FormData();
@@ -11,10 +11,8 @@ export const predictPresence = async (inputFile: File) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    let response = res.data;
-    response = response.replaceAll("'", '"');
-    response = JSON.parse(response);
-    return response;
+    console.log(JSON.stringify(res.data));
+    return res.data;
   } catch (e) {
     console.log(e);
   }
