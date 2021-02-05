@@ -3,19 +3,15 @@ import axios from "axios";
 const URL = "http://localhost:8000/predict_conformity";
 
 export const predictConformity = async (inputFile: File) => {
-  const request = {
-    file: inputFile,
-  };
+  const formData = new FormData();
+  formData.append("file", inputFile);
   try {
-    const res = await axios.post(URL, request, {
+    const res = await axios.post(URL, formData, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
     });
-    let response = res.data;
-    response = response.replaceAll("'", '"');
-    response = JSON.parse(response);
-    return response;
+    return res.data;
   } catch (e) {
     console.log(e);
   }
