@@ -21,7 +21,7 @@
         v-on:click="raz()"
         :width="imgWidth"
       />
-      <div>Surface sélectionnnée : {{ surface }} m²</div>
+      <div v-if="surface != 0">Surface sélectionnnée : {{ surface }} m²</div>
     </div>
   </div>
 </template>
