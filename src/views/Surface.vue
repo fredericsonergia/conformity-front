@@ -8,13 +8,7 @@
     </select>
     <RadioButtons
       :radioProps="{
-        choices: radioProps.choices.filter((choice) => {
-          return (
-            (selected === 'Reconnaissance d\'image' &&
-              choice.id != 'address') ||
-            selected === 'Géographique'
-          );
-        }),
+        choices: radioProps.choices,
         method: radioProps.method,
       }"
       v-if="selected"
