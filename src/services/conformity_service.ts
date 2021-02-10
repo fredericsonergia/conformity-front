@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const URL = "http://localhost:8000/predict_conformity";
+const URL = "http://localhost:8000/conformity";
 
 export const predictConformity = async (inputFile: File) => {
   const formData = new FormData();

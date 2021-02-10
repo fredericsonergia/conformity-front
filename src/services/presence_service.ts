@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const URL = "http://localhost:8000/predict_presence";
+const URL = "http://localhost:8000/presence";
 
 export const predictPresence = async (inputFile: File) => {
   const formData = new FormData();
